@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Line Name Selector</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        body {
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: green;
+            overflow: hidden;
+        }
+        #console {
+            width: 80%;
+            height: 80%;
+            background-color: black;
+            color: green;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            white-space: pre;
+            caret-color: green;
+            border: 3px solid #333;
+            box-shadow: 0 0 20px 5px #333;
+        }
+        #console:focus {
+            outline: none;
+        }
+        #userInput {
+            color: green;
+            background-color: black;
+            border: none;
+            resize: none;
+            width: calc(100% - 40px);
+            overflow: hidden;
+            min-height: 20px;
+        }
+        #userInput:focus {
+            outline: none;
+        }
+        .window-title-bar {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            background-color: #000080; /* Dark blue */
+            color: white;
+            padding: 5px 0;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .window-title {
+            display: inline-block;
+            background: linear-gradient(to right, #008000, #ffffff, #008000);
+            padding: 2px 10px;
+            border: 1px solid #ffffff;
+        }
+        .bold {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="console" contenteditable="false">
+        <div class="window-title-bar">
+            <span class="window-title">Mellow Yell's Giveaway-O-Matic</span>
+        </div>
+        Enter names (each on a new line):
+        <div id="userInput" contenteditable="true"></div>
+    </div>
+
+    <script>
+        const consoleElement = document.getElementById('console');
+        const userInput = document.getElementById('userInput');
+        let names = [];
+
+        userInput.focus();
+        userInput.onkeydown = (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                if (names.length === 0) {
+                    const input = userInput.innerText;
+                    names = input.split('\n').map(name => name.trim()).filter(Boolean);
+                    userInput.style.display = 'none'; // Hide text input
+                    consoleElement.innerHTML += '\n\n<span class="bold">Entry Count: ' + names.length + '</span>';
+                    consoleElement.innerHTML += '\n\n' + names.join('\n') + '\n\nSelecting a random name...';
+                    startSelection();
+                }
+            }
+        };
+
+        function startSelection() {
+            let counter = 30; // Run the loop 30 times (3 seconds at interval of 0.1s)
+            const selectionInterval = setInterval(() => {
+                const randomName = names[Math.floor(Math.random() * names.length)];
+                let currentText = consoleElement.innerText;
+                let lines = currentText.split('\n');
+                lines[lines.length - 1] = 'Selecting a random name... ' + randomName;
+                consoleElement.innerText = lines.join('\n');
+                
+                counter--;
+                if (counter === 0) {
+                    clearInterval(selectionInterval);
+                    consoleElement.innerText += '\n\n' + randomName + ' is the winner!';
+                }
+            }, 100);
+        }
+    </script>
+</body>
+</html>
